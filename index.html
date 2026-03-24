@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construction Design Solutions — 3D Visualization & Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #1B3A5C;
+    --navy2:  #162F4A;
+    --orange: #C8622A;
+    --cream:  #F5F0E8;
+    --sand:   #E8E0D0;
+    --ink:    #1a1a18;
+    --muted:  #7a776e;
+    --white:  #ffffff;
+    --grid:   rgba(200,98,42,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── BLUEPRINT GRID TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  * { position: relative; z-index: 1; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--navy);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    border-bottom: 3px solid var(--orange);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--orange); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--orange); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 64px 80px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 2px;
+    background: var(--orange);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 7vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .hero-title .accent { color: var(--orange); display: block; }
+
+  .hero-sub {
+    font-size: 20px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.6);
+    max-width: 420px;
+    margin: 24px 0 48px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--orange);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 36px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { background: #b3541f; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 36px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* Hero right — blueprint visual */
+  .hero-right {
+    background: var(--navy2);
+    border-left: 3px solid var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,98,42,0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,98,42,0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .blueprint-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,98,42,0.3);
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .blueprint-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(200,98,42,0.3);
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--white);
+    letter-spacing: 1px;
+  }
+
+  .stat-value.orange { color: var(--orange); }
+
+  /* ── SECTION WRAPPER ── */
+  section { padding: 100px 0; }
+
+  .container {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 48px;
+    background: var(--orange);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 64px);
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  .section-body {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ── PROBLEM SECTION ── */
+  #problem {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  #problem .section-title { color: var(--white); }
+  #problem .section-body { color: rgba(255,255,255,0.55); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+
+  .problem-card {
+    background: var(--navy2);
+    padding: 40px 32px;
+    border-top: 3px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .problem-card:hover { border-color: var(--orange); }
+
+  .problem-card.center {
+    background: var(--orange);
+  }
+
+  .problem-icon {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--orange);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .problem-card.center .problem-icon { color: var(--white); }
+
+  .problem-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .problem-card p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .problem-card.center p { color: rgba(255,255,255,0.85); }
+
+  /* ── SERVICES ── */
+  #services { background: var(--cream); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 64px;
+  }
+
+  .service-card {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    padding: 0;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(27,58,92,0.12);
+  }
+
+  .service-card-top {
+    background: var(--navy);
+    padding: 28px 28px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: rgba(255,255,255,0.15);
+    line-height: 1;
+  }
+
+  .service-tier-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--orange);
+    text-align: right;
+  }
+
+  .service-card-body { padding: 28px; }
+
+  .service-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 1px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .service-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--orange);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .service-turnaround {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .service-desc {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+
+  .service-features {
+    list-style: none;
+    border-top: 1px solid var(--sand);
+    padding-top: 16px;
+  }
+
+  .service-features li {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--navy);
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .service-features li::before {
+    content: '→';
+    color: var(--orange);
+    font-size: 13px;
+  }
+
+  /* ── HOW IT WORKS ── */
+  #process {
+    background: var(--navy);
+  }
+
+  #process .section-title { color: var(--white); }
+  #process .section-body { color: rgba(255,255,255,0.55); }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    margin-top: 64px;
+    position: relative;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--orange), rgba(200,98,42,0.2));
+    z-index: 0;
+  }
+
+  .process-step {
+    text-align: center;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-circle {
+    width: 72px;
+    height: 72px;
+    background: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: var(--white);
+    letter-spacing: 1px;
+    border: 3px solid var(--navy);
+    outline: 2px solid var(--orange);
+  }
+
+  .step-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .step-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* ── WHY US ── */
+  #why { background: var(--cream); }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 64px;
+  }
+
+  .why-card {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    padding: 32px 28px;
+    border-left: 4px solid var(--orange);
+    transition: transform 0.2s;
+  }
+
+  .why-card:hover { transform: translateX(4px); }
+
+  .why-icon { font-size: 32px; margin-bottom: 16px; display: block; }
+
+  .why-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+
+  .why-body {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── CTA ── */
+  #contact {
+    background: var(--navy);
+    text-align: center;
+  }
+
+  #contact .section-label { justify-content: center; }
+  #contact .section-label::after { display: none; }
+  #contact .section-label::before { content: ''; display: block; height: 1px; width: 48px; background: var(--orange); }
+
+  #contact .section-title {
+    color: var(--white);
+    font-size: clamp(48px, 6vw, 80px);
+    margin-bottom: 16px;
+  }
+
+  #contact .section-body {
+    color: rgba(255,255,255,0.5);
+    margin: 0 auto 48px;
+    font-style: italic;
+  }
+
+  .contact-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 16px;
+  }
+
+  .contact-email {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-right: none;
+    padding: 16px 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 1px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy2);
+    border-top: 3px solid var(--orange);
+    padding: 32px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .footer-logo span { color: var(--orange); }
+
+  .footer-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+  }
+
+  /* ── ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 100px 32px 60px; }
+    .problem-grid, .services-grid, .why-grid { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .process-steps::before { display: none; }
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .container { padding: 0 24px; }
+    section { padding: 72px 0; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">CDS<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-eyebrow">3D Visualization & Construction Documentation</div>
+    <h1 class="hero-title">
+      Construction
+      <span class="accent">Design</span>
+      Solutions
+    </h1>
+    <p class="hero-sub">Bridging the gap between sales, customers, and installers — with visuals every party can actually work from.</p>
+    <div class="hero-cta">
+      <a href="#services" class="btn-primary">View Services</a>
+      <a href="#contact" class="btn-secondary">Get a Render</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="blueprint-card">
+      <div class="blueprint-label">// Project Specs</div>
+      <div class="stat-row">
+        <span class="stat-label">AI Quick Visual</span>
+        <span class="stat-value orange">$75</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Pro 3D Render</span>
+        <span class="stat-value orange">$200</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Full Construction Pkg</span>
+        <span class="stat-value orange">$500</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Turnaround</span>
+        <span class="stat-value" style="font-size:20px;">Same Day — 72hr</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Room Types</span>
+        <span class="stat-value" style="font-size:18px; color: rgba(255,255,255,0.6);">All Interiors</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="section-label reveal">The Problem</div>
+    <h2 class="section-title reveal reveal-delay-1">Three Parties.<br>Zero Alignment.</h2>
+    <p class="section-body reveal reveal-delay-2">Every remodeling project involves a salesperson, a customer, and an installer. Too often, none of them are working from the same picture — and it costs everyone.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal reveal-delay-1">
+        <div class="problem-icon">S</div>
+        <h3>The Salesperson</h3>
+        <p>Closes the deal with words and samples, hoping the customer's mental image matches what was actually sold.</p>
+      </div>
+      <div class="problem-card center reveal reveal-delay-2">
+        <div class="problem-icon" style="color:white">✕</div>
+        <h3>The Disconnect</h3>
+        <p>Miscommunication leads to change orders, disputes, and failed installs that cost thousands and damage relationships.</p>
+      </div>
+      <div class="problem-card reveal reveal-delay-3">
+        <div class="problem-icon">I</div>
+        <h3>The Installer</h3>
+        <p>Builds from verbal descriptions and basic drawings, with no reliable visual reference to execute from.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="container">
+    <div class="section-label reveal">What We Offer</div>
+    <h2 class="section-title reveal reveal-delay-1">Three Tiers.<br>One Solution.</h2>
+    <p class="section-body reveal reveal-delay-2">From a same-day AI visual to a full construction package — the right deliverable for every job size and budget.</p>
+
+    <div class="services-grid">
+
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-card-top">
+          <span class="service-num">01</span>
+          <span class="service-tier-label">Entry Tier</span>
+        </div>
+        <div class="service-card-body">
+          <div class="service-name">AI Quick Visual</div>
+          <div class="service-price">$75</div>
+          <div class="service-turnaround">// Same Day Delivery</div>
+          <p class="service-desc">AI-generated visualization from your material selections and inspiration photos. Perfect for closing the deal on the spot before the customer walks out.</p>
+          <ul class="service-features">
+            <li>AI-powered rendering</li>
+            <li>Same-day turnaround</li>
+            <li>Customer-ready visual</li>
+            <li>Ideal for active sales calls</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-card-top" style="background: var(--orange);">
+          <span class="service-num">02</span>
+          <span class="service-tier-label" style="color:rgba(255,255,255,0.8)">Most Popular</span>
+        </div>
+        <div class="service-card-body">
+          <div class="service-name">Pro 3D Render</div>
+          <div class="service-price">$200</div>
+          <div class="service-turnaround">// 24–48 Hour Turnaround</div>
+          <p class="service-desc">Full 3D model built to your exact specifications with photorealistic rendering. The standard deliverable for mid-to-high value remodeling projects.</p>
+          <ul class="service-features">
+            <li>Photorealistic output</li>
+            <li>Multiple viewing angles</li>
+            <li>Material-accurate finishes</li>
+            <li>Shareable with client</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="service-card reveal reveal-delay-3">
+        <div class="service-card-top" style="background: #162F4A;">
+          <span class="service-num">03</span>
+          <span class="service-tier-label">Full Package</span>
+        </div>
+        <div class="service-card-body">
+          <div class="service-name">Construction Package</div>
+          <div class="service-price">$500</div>
+          <div class="service-turnaround">// 48–72 Hour Turnaround</div>
+          <p class="service-desc">Everything in Tier 2 plus a complete construction document — cut lists, material quantities, and installer notes your lead can actually build from.</p>
+          <ul class="service-features">
+            <li>Pro render included</li>
+            <li>Cut list + material takeoff</li>
+            <li>Material quantities by room</li>
+            <li>Installer-ready document</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="container">
+    <div class="section-label reveal">How It Works</div>
+    <h2 class="section-title reveal reveal-delay-1">Simple Process.<br>Zero Guesswork.</h2>
+    <p class="section-body reveal reveal-delay-2">From first meeting to job site — everyone works from the same visual.</p>
+
+    <div class="process-steps">
+      <div class="process-step reveal reveal-delay-1">
+        <div class="step-circle">01</div>
+        <span class="step-icon">📋</span>
+        <div class="step-title">Submit Intake Form</div>
+        <p class="step-desc">Salesperson fills out our structured form with room dimensions, material selections, and customer preferences.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-2">
+        <div class="step-circle">02</div>
+        <span class="step-icon">🖥️</span>
+        <div class="step-title">We Build the Model</div>
+        <p class="step-desc">CDS creates a full 3D model and photorealistic render matched exactly to the submitted specs.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-3">
+        <div class="step-circle">03</div>
+        <span class="step-icon">✅</span>
+        <div class="step-title">Customer Approves</div>
+        <p class="step-desc">Share the visual with your customer so they see exactly what they agreed to — before a single nail is driven.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-4">
+        <div class="step-circle">04</div>
+        <span class="step-icon">📐</span>
+        <div class="step-title">Installer Gets Docs</div>
+        <p class="step-desc">For Tier 3 jobs, the lead installer receives a full construction package with cut lists and material quantities.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-5">
+        <div class="step-circle">05</div>
+        <span class="step-icon">🏠</span>
+        <div class="step-title">Confident Execution</div>
+        <p class="step-desc">Everyone works from the same source of truth. Fewer surprises. Fewer change orders. Happier customers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="container">
+    <div class="section-label reveal">Why Choose CDS</div>
+    <h2 class="section-title reveal reveal-delay-1">Built By Someone<br>Who's Been On Site.</h2>
+    <p class="section-body reveal reveal-delay-2">We don't just make pretty pictures. We make documents your whole team can execute on — because we've worked both sides of the remodeling process.</p>
+
+    <div class="why-grid">
+      <div class="why-card reveal reveal-delay-1">
+        <span class="why-icon">🏗️</span>
+        <div class="why-title">Real Industry Experience</div>
+        <p class="why-body">Built by someone with hands-on construction and remodeling experience. We understand the workflow, the constraints, and what actually matters on site.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-2">
+        <span class="why-icon">⚡</span>
+        <div class="why-title">Fast Turnaround</div>
+        <p class="why-body">Same-day AI visuals and 24–72 hour full renders keep your sales pipeline moving. No waiting a week for a visual your customer needs today.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-3">
+        <span class="why-icon">📋</span>
+        <div class="why-title">Installer-Ready Docs</div>
+        <p class="why-body">Cut lists and material takeoffs give your lead installer a solid foundation to execute from — not just a pretty picture to guess from.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-1">
+        <span class="why-icon">🎯</span>
+        <div class="why-title">Tiered Pricing</div>
+        <p class="why-body">From a $75 quick visual to a $500 full package — the right deliverable for every job type, without paying for more than you need.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-2">
+        <span class="why-icon">🔄</span>
+        <div class="why-title">All Interior Remodels</div>
+        <p class="why-body">Kitchens, bathrooms, basements, living spaces — if it's an interior remodel, we can render it.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-3">
+        <span class="why-icon">📐</span>
+        <div class="why-title">Structured Intake Process</div>
+        <p class="why-body">Our detailed intake form captures everything upfront so no project starts with missing information or assumptions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label reveal">Get Started</div>
+    <h2 class="section-title reveal reveal-delay-1">Ready to Close<br>More Deals?</h2>
+    <p class="section-body reveal reveal-delay-2">Stop letting miscommunication cost you contracts. Submit your first project and receive your render within 24–72 hours.</p>
+    <div style="margin-top: 48px;" class="reveal reveal-delay-3">
+      <a href="mailto:hello@constructiondesignsolutions.com" class="btn-primary" style="font-size:13px; padding: 18px 48px;">
+        Submit a Project →
+      </a>
+    </div>
+    <div class="contact-box reveal reveal-delay-4">
+      <div class="contact-email">hello@constructiondesignsolutions.com</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Construction Design <span>Solutions</span></div>
+  <div class="footer-note">constructiondesignsolutions.com &nbsp;|&nbsp; © 2025</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Also trigger visible for hero elements on load
+  document.querySelectorAll('.hero .reveal, .hero-left > *').forEach(el => {
+    el.classList.add('visible');
+  });
+</script>
+</body>
+</html>
